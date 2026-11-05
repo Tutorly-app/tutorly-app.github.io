@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutorly: homework help that shows its work</title>
+<meta name="description" content="Free study app for Windows. Homework help for every subject with double-checked answers, lessons, flashcards, practice tests, SAT prep, notes and a study planner. No ads, no paywalls, no account.">
+<link rel="icon" href="img/favicon-32.png" sizes="32x32">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<meta property="og:title" content="Tutorly: homework help that shows its work">
+<meta property="og:description" content="Free for every student. Double-checked answers, lessons, flashcards, practice tests and SAT prep.">
+<meta property="og:image" content="img/home.jpg">
+<style>
+@font-face { font-family: "Figtree"; src: url(fonts/Figtree.woff2) format("woff2"); font-weight: 300 900; font-display: swap; }
+@font-face { font-family: "Bricolage"; src: url(fonts/Bricolage-600.woff2) format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Bricolage"; src: url(fonts/Bricolage-800.woff2) format("woff2"); font-weight: 800; font-display: swap; }
+/* Layout idea: the app's dot-grid notebook, opened up. A left-aligned hero with a tilted stack of screens,
+   sticky notes for the promises, a colorful bento of tools, and one black slab to download. */
+:root {
+  --bg: #F6F6F3; --dot: #DADBD4; --panel: #FFFFFF; --soft: #EFEFEA; --ink: #161616; --muted: #5E6066; --faint: #8A8C92;
+  --marker: #FFD93D; --marker-soft: #FFF3B5;
+  --ask-t: #ECE6FF; --ask-i: #6440F0; --learn-t: #DCF4E6; --learn-i: #0E8E55; --cards-t: #FFE5D6; --cards-i: #DD5A1F;
+  --test-t: #DDEBFF; --test-i: #2862D8; --sat-t: #FFF0BF; --sat-i: #A87400; --notes-t: #FFE1EC; --notes-i: #CC3573;
+  --plan-t: #DAF1EE; --plan-i: #0C8577; --focus-t: #FFE8D0; --focus-i: #CC6A06;
+  --shadow: 0 1px 1px rgba(20,20,10,.04), 0 16px 40px -22px rgba(20,20,10,.3);
+  --big: 0 2px 2px rgba(20,20,10,.04), 0 40px 80px -30px rgba(20,20,10,.45);
+  --ui: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --display: "Bricolage", "Figtree", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #121212; --dot: #252525; --panel: #1B1B1C; --soft: #252527; --ink: #F3F2EE; --muted: #B0AFAA; --faint: #85847F; --marker-soft: rgba(255,217,61,.16);
+  --ask-t: rgba(140,110,255,.18); --ask-i: #B3A0FF; --learn-t: rgba(40,200,120,.16); --learn-i: #5FDA9C; --cards-t: rgba(255,120,60,.17); --cards-i: #FF9F6E;
+  --test-t: rgba(70,130,255,.18); --test-i: #8DB2FF; --sat-t: rgba(255,200,40,.16); --sat-i: #FFD25E; --notes-t: rgba(255,90,150,.16); --notes-i: #FF8DB8;
+  --plan-t: rgba(30,190,170,.16); --plan-i: #57D6C6; --focus-t: rgba(255,150,40,.17); --focus-i: #FFB15E;
+  --shadow: 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px -22px rgba(0,0,0,.9); --big: 0 0 0 1px rgba(255,255,255,.06), 0 40px 80px -30px rgba(0,0,0,.95);
+  color-scheme: dark;
+} }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background-color: var(--bg); background-image: radial-gradient(var(--dot) 1.1px, transparent 1.3px); background-size: 22px 22px; color: var(--ink); font: 17px/1.6 var(--ui); font-weight: 450; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; letter-spacing: -.03em; }
+a { color: inherit; }
+img { max-width: 100%; height: auto; display: block; }
+:focus-visible { outline: 3px solid var(--marker); outline-offset: 3px; border-radius: 10px; }
+::selection { background: var(--marker); color: #161616; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+.wrap { width: min(1180px, 100% - 40px); margin: 0 auto; }
+mark { background: linear-gradient(transparent 56%, var(--marker) 56%, var(--marker) 90%, transparent 90%); color: inherit; padding: 0 .08em; }
+
+.top { position: sticky; top: 14px; z-index: 20; margin-top: 14px; }
+.top .bar { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 16px; border-radius: 999px; background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(12px); box-shadow: var(--shadow); }
+.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; font: 800 22px/1 var(--display); letter-spacing: -.04em; }
+.brand img { width: 32px; height: 32px; }
+.top nav { display: flex; gap: 2px; margin-left: auto; }
+.top nav a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 15px; padding: 8px 14px; border-radius: 999px; }
+.top nav a:hover { background: var(--soft); color: var(--ink); }
+@media (max-width: 760px) { .top nav { display: none; } .top .bar .pill { margin-left: auto; } }
+
+.pill { display: inline-flex; align-items: center; gap: 9px; height: 46px; padding: 0 22px; border-radius: 999px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 16px; text-decoration: none; transition: transform .2s cubic-bezier(.34,1.4,.6,1), filter .2s; white-space: nowrap; }
+.pill:hover { transform: translateY(-2px); filter: brightness(1.2); }
+.pill.big { height: 58px; padding: 0 30px; font-size: 18px; }
+.pill.yellow { background: var(--marker); color: #161616; }
+.pill svg { flex: none; }
+
+.hero { display: grid; grid-template-columns: 1fr 1.05fr; gap: 40px; align-items: center; padding: 80px 0 40px; }
+.hero h1 { font-size: clamp(46px, 6.4vw, 84px); font-weight: 800; line-height: .98; letter-spacing: -.045em; }
+.hero .lead { font-size: 20px; color: var(--muted); margin: 24px 0 32px; max-width: 30em; }
+.hero .meta { margin-top: 14px; color: var(--faint); font-size: 15px; font-weight: 600; }
+.stack { position: relative; height: 520px; }
+.stack img { position: absolute; width: 92%; border-radius: 18px; box-shadow: var(--big); }
+.stack .a { right: 0; top: 0; transform: rotate(2.5deg); }
+.stack .b { left: 0; bottom: 0; width: 80%; transform: rotate(-4deg); }
+.sticker { position: absolute; z-index: 2; padding: 12px 16px; border-radius: 16px; font: 800 17px/1.2 var(--display); box-shadow: var(--shadow); }
+.sticker.s1 { background: var(--marker); color: #161616; left: 8%; top: 4%; transform: rotate(-7deg); }
+.sticker.s2 { background: #DCF4E6; color: #0E8E55; right: -2%; bottom: 10%; transform: rotate(6deg); }
+@media (max-width: 960px) { .hero { grid-template-columns: 1fr; padding-top: 50px; } .stack { height: 400px; } }
+@media (max-width: 560px) { .stack { height: 260px; } }
+
+.notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; padding: 40px 0 10px; }
+.note { padding: 26px 26px 30px; border-radius: 6px 6px 26px 6px; box-shadow: var(--shadow); transition: transform .3s cubic-bezier(.34,1.4,.6,1); }
+.note:nth-child(1) { background: var(--marker-soft); transform: rotate(-1.5deg); }
+.note:nth-child(2) { background: var(--ask-t); transform: rotate(1deg); }
+.note:nth-child(3) { background: var(--learn-t); transform: rotate(-.5deg); }
+.note:hover { transform: rotate(0) translateY(-4px); }
+.note b { display: block; font: 800 24px/1.15 var(--display); letter-spacing: -.03em; margin-bottom: 8px; }
+.note p { color: var(--muted); font-size: 16px; }
+@media (max-width: 860px) { .notes { grid-template-columns: 1fr; } }
+
+section { padding: 110px 0 0; }
+.kicker { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: 999px; background: var(--panel); box-shadow: var(--shadow); font-weight: 700; font-size: 14px; color: var(--muted); }
+section h2 { font-size: clamp(36px, 4.6vw, 58px); font-weight: 800; line-height: 1.02; margin: 18px 0 16px; max-width: 16ch; }
+section .sub { color: var(--muted); font-size: 19px; max-width: 40em; }
+
+.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; margin-top: 46px; }
+.tile { border-radius: 26px; padding: 28px; background: var(--panel); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; overflow: hidden; position: relative; }
+.tile.c2 { grid-column: span 2; } .tile.c3 { grid-column: span 3; } .tile.c4 { grid-column: span 4; } .tile.c6 { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 22px; flex-wrap: wrap; }
+.tile .ic { width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--t); color: var(--i); transform: rotate(-5deg); flex: none; }
+.tile.tint { background: var(--t); }
+.tile.tint .ic { background: var(--panel); }
+.tile h3 { font-size: 26px; font-weight: 800; line-height: 1.1; }
+.tile p { color: var(--muted); font-size: 16px; }
+.tile ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.tile li { display: flex; gap: 10px; font-size: 15.5px; font-weight: 600; }
+.tile li::before { content: ""; flex: none; width: 18px; height: 18px; margin-top: 3px; border-radius: 6px; background: var(--i) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4L18 8' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat; }
+.tile .shot { margin: 12px -28px -28px 28px; border-radius: 16px 0 0 0; box-shadow: var(--big); }
+.tile .shot.full { margin: 14px -28px -28px; border-radius: 0; box-shadow: none; border-top: 1px solid rgba(127,127,127,.15); }
+.t-ask { --t: var(--ask-t); --i: var(--ask-i); } .t-learn { --t: var(--learn-t); --i: var(--learn-i); } .t-cards { --t: var(--cards-t); --i: var(--cards-i); }
+.t-test { --t: var(--test-t); --i: var(--test-i); } .t-sat { --t: var(--sat-t); --i: var(--sat-i); } .t-notes { --t: var(--notes-t); --i: var(--notes-i); }
+.t-plan { --t: var(--plan-t); --i: var(--plan-i); } .t-focus { --t: var(--focus-t); --i: var(--focus-i); }
+@media (max-width: 1000px) { .bento { grid-template-columns: repeat(2, 1fr); } .tile.c3, .tile.c4 { grid-column: span 2; } .tile.c2 { grid-column: span 1; } }
+@media (max-width: 600px) { .bento { grid-template-columns: 1fr; } .tile.c2, .tile.c3, .tile.c4 { grid-column: auto; } }
+
+.checks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 50px; position: relative; }
+.checks::before { content: ""; position: absolute; left: 6%; right: 6%; top: 30px; height: 3px; background: repeating-linear-gradient(90deg, var(--ink) 0 10px, transparent 10px 20px); opacity: .25; }
+.check { position: relative; }
+.check .n { width: 62px; height: 62px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; font: 800 26px/1 var(--display); margin-bottom: 20px; box-shadow: 0 0 0 8px var(--bg); }
+.check:nth-child(2) .n { background: var(--marker); color: #161616; }
+.check b { display: block; font: 800 24px/1.15 var(--display); letter-spacing: -.03em; margin-bottom: 8px; }
+.check p { color: var(--muted); }
+.honest { margin-top: 40px; display: flex; gap: 14px; align-items: flex-start; padding: 20px 24px; border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); max-width: 820px; }
+.honest span { flex: none; width: 34px; height: 34px; border-radius: 11px; background: var(--marker); color: #161616; display: grid; place-items: center; font-weight: 900; }
+@media (max-width: 860px) { .checks { grid-template-columns: 1fr; } .checks::before { display: none; } }
+
+.free { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; margin-top: 46px; }
+.card { border-radius: 26px; padding: 30px; background: var(--panel); box-shadow: var(--shadow); }
+.card h3 { font-size: 24px; font-weight: 800; margin-bottom: 14px; }
+.card p { color: var(--muted); }
+.todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: t; }
+.todo li { counter-increment: t; display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start; font-size: 17px; }
+.todo li::before { content: counter(t); width: 34px; height: 34px; border-radius: 11px; background: var(--ink); color: var(--bg); display: grid; place-items: center; font: 800 16px/1 var(--display); }
+@media (max-width: 860px) { .free { grid-template-columns: 1fr; } }
+
+.faq { columns: 2 380px; column-gap: 22px; margin-top: 40px; }
+details { break-inside: avoid; margin-bottom: 14px; padding: 20px 24px; border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); }
+summary { cursor: pointer; font: 600 19px/1.3 var(--display); letter-spacing: -.01em; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; flex: none; width: 28px; height: 28px; border-radius: 9px; background: var(--soft); display: grid; place-items: center; font-weight: 800; transition: transform .3s; }
+details[open] summary::after { transform: rotate(45deg); background: var(--marker); color: #161616; }
+details p { margin-top: 12px; color: var(--muted); font-size: 16px; }
+
+.slab { margin: 120px 0 0; padding: 70px 40px; border-radius: 34px; background: #161616; color: #F6F6F3; text-align: center; position: relative; overflow: hidden; }
+.slab::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(#2c2c2c 1.1px, transparent 1.3px); background-size: 22px 22px; }
+.slab > * { position: relative; }
+.slab img { width: 80px; margin: 0 auto 24px; transform: rotate(-6deg); }
+.slab h2 { font-size: clamp(38px, 5vw, 64px); font-weight: 800; line-height: 1; margin: 0 auto 16px; max-width: 14ch; }
+.slab h2 mark { background: linear-gradient(transparent 58%, #FFD93D 58%, #FFD93D 92%, transparent 92%); color: #F6F6F3; }
+.slab p { color: #B0AFAA; font-size: 18px; }
+.slab .row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+.slab .pill.ghost { background: transparent; color: #F6F6F3; box-shadow: inset 0 0 0 2px #3a3a3a; }
+footer { padding: 34px 0 46px; color: var(--faint); font-size: 14px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ask" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="learn" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5M22 9v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="cards" viewBox="0 0 24 24"><path d="M4 7h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM7 4h13a2 2 0 0 1 2 2v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="test" viewBox="0 0 24 24"><path d="M9 4h6v3H9zM8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M8.5 14l2.5 2.5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="sat" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5M12 11a1 1 0 1 0 1 1M13 11l7-7M16 4h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="notes" viewBox="0 0 24 24"><path d="M6 3h9l5 5v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v6h6M9 13h7M9 17h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="plan" viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 10h16M8 3v4M16 3v4M8.5 15l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="focus" viewBox="0 0 24 24"><path d="M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM12 9v4l2.5 2.5M9 2h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="wrap top">
+  <div class="bar">
+    <a class="brand" href="#"><img src="img/icon.svg" alt="">tutorly</a>
+    <nav aria-label="Sections"><a href="#tools">What it does</a><a href="#checks">How it checks</a><a href="#free">Free</a><a href="#faq">FAQ</a></nav>
+    <a class="pill" href="https://github.com/Tutorly-app/tutorly-app.github.io/releases/latest/download/Tutorly.zip"><svg width="18" height="18"><use href="#dl"/></svg>Download</a>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Homework help that <mark>shows its work</mark>, and checks it.</h1>
+      <p class="lead">Any subject, any grade. Tutorly explains every step, double-checks the answer before you see it, then helps it stick with lessons, flashcards and practice tests.</p>
+      <a class="pill big" href="https://github.com/Tutorly-app/tutorly-app.github.io/releases/latest/download/Tutorly.zip"><svg width="20" height="20"><use href="#dl"/></svg>Download for Windows</a>
+      <div class="meta">Free · Windows 10 and 11 · No account</div>
+    </div>
+    <div class="stack" aria-hidden="true">
+      <span class="sticker s1">100% free</span>
+      <img class="a" src="img/ask.jpg" alt="" width="1632" height="1080">
+      <img class="b" src="img/home-dark.jpg" alt="" width="1632" height="1080">
+      <span class="sticker s2">✓ Double-checked</span>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>No paywalls.</b><p>Learn mode, practice tests and step-by-step explanations are all free. There's nothing to unlock and no ads.</p></div>
+    <div class="note"><b>Right, or it tells you.</b><p>Math runs as real code, then a second check re-solves the problem from scratch. When it isn't sure, it says so.</p></div>
+    <div class="note"><b>Teaches, not just tells.</b><p>Hide the answer and reveal one step at a time, or ask for it explained simpler, another way, or with an analogy.</p></div>
+  </div>
+
+  <section id="tools">
+    <span class="kicker">Eight tools, one app</span>
+    <h2>Everything for studying, in one place.</h2>
+    <p class="sub">Every tool feeds the next: solve a problem, turn it into flashcards, test yourself, and let the planner fit it all in before your exam.</p>
+    <div class="bento">
+      <div class="tile c4 t-ask">
+        <span class="ic"><svg width="24" height="24"><use href="#ask"/></svg></span>
+        <h3>Homework help</h3>
+        <p>Type it, paste it, or drop in a photo of your worksheet. Math, science, essays, history, languages, code, kindergarten to college.</p>
+        <ul><li>Shows how it read your question, so misreads get fixed</li><li>Every answer choice explained, including the tempting wrong ones</li><li>Graphs, real math notation, read-aloud, and follow-up questions</li></ul>
+        <img class="shot" src="img/ask.jpg" alt="Tutorly solving a word problem step by step" loading="lazy" width="1632" height="1080">
+      </div>
+      <div class="tile c2 tint t-cards">
+        <span class="ic"><svg width="24" height="24"><use href="#cards"/></svg></span>
+        <h3>Flashcards</h3>
+        <p>Spaced repetition shows each card right before you'd forget it. Learn and Test modes are free with no limits.</p>
+        <ul><li>AI makes cards from notes, photos or PDFs</li><li>Import from Quizlet or Anki</li></ul>
+        <img class="shot" style="margin-top:auto" src="img/cards.jpg" alt="A flashcard that looks like an index card, with Again, Hard, Good and Easy buttons" loading="lazy" width="1632" height="1080">
+      </div>
+      <div class="tile c2 tint t-learn">
+        <span class="ic"><svg width="24" height="24"><use href="#learn"/></svg></span>
+        <h3>Lessons</h3>
+        <p>Bite-size explanations with a check after each part. Miss one and Tutorly re-teaches it a different way.</p>
+      </div>
+      <div class="tile c2 tint t-test">
+        <span class="ic"><svg width="24" height="24"><use href="#test"/></svg></span>
+        <h3>Practice tests</h3>
+        <p>Realistic tests from any topic or your own material. Written answers graded fairly, and weak spots tracked.</p>
+      </div>
+      <div class="tile c2 tint t-sat">
+        <span class="ic"><svg width="24" height="24"><use href="#sat"/></svg></span>
+        <h3>SAT prep</h3>
+        <p>Digital SAT practice by domain and full timed modules, with the trap behind every wrong choice.</p>
+      </div>
+      <div class="tile c3 t-notes">
+        <span class="ic"><svg width="24" height="24"><use href="#notes"/></svg></span>
+        <h3>Notes, your way</h3>
+        <p><b>Simple</b> reads like you wrote it in class. <b>Standard</b> is clean and organized. <b>Deep dive</b> is a full study guide. Every level is just as accurate. Or paste your messy notes to get them cleaned up.</p>
+        <img class="shot full" src="img/notes.jpg" alt="Simple-style notes on lined paper" loading="lazy" width="1632" height="1080">
+      </div>
+      <div class="tile c3 t-plan">
+        <span class="ic"><svg width="24" height="24"><use href="#plan"/></svg></span>
+        <h3>Study planner</h3>
+        <p>Enter your test date and what's on it. Get a day-by-day plan with spaced practice and practice tests, each task one click away.</p>
+        <img class="shot full" src="img/plan.jpg" alt="A study plan with daily tasks and an exam countdown" loading="lazy" width="1632" height="1080">
+      </div>
+      <div class="tile c6 tint t-focus">
+        <span class="ic"><svg width="24" height="24"><use href="#focus"/></svg></span>
+        <div style="flex: 1; min-width: 240px;"><h3>Focus timer and streaks</h3><p>Work in focused blocks with short breaks. Every minute counts toward your daily goal and streak.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="checks">
+    <span class="kicker">Accuracy</span>
+    <h2>Three checks before you see an answer.</h2>
+    <p class="sub">Most homework apps give a wrong answer just as confidently as a right one. Tutorly is built not to.</p>
+    <div class="checks">
+      <div class="check"><div class="n">1</div><b>Read it right</b><p>Photos are transcribed first, and you see exactly how Tutorly read your question. One click fixes a misread number.</p></div>
+      <div class="check"><div class="n">2</div><b>Compute, don't guess</b><p>Arithmetic, algebra and science math run as real code. Then the answer is verified a second way: plugging it back in, checking units, re-reading the question.</p></div>
+      <div class="check"><div class="n">3</div><b>Solve it again</b><p>An independent pass re-solves the problem from scratch. If it finds a mistake, the answer is fixed, and you're told what changed.</p></div>
+    </div>
+    <div class="honest"><span>!</span><p><b>Honest note:</b> AI can still make mistakes, especially with blurry photos or unclear questions. When Tutorly isn't sure, it says so, so check it against your class notes.</p></div>
+  </section>
+
+  <section id="free">
+    <span class="kicker">Free, for real</span>
+    <h2>Free AI from Google. One minute to set up.</h2>
+    <p class="sub">Tutorly runs on Google's Gemini AI, which has a free tier. You get your own free key: no subscription, no credit card.</p>
+    <div class="free">
+      <div class="card"><h3>Set it up</h3><ol class="todo"><li>Download Tutorly and open it.</li><li>Click <b>Open Google AI Studio</b>, sign in with any Google account, then click <b>Create API key</b>.</li><li>Paste the key into Tutorly. That's it.</li></ol></div>
+      <div class="card"><h3>Good to know</h3><p>Google's free tier has daily limits. Tutorly switches to another free model automatically when you hit one, and flashcards, notes, the planner and the timer work without AI. Your key is encrypted on your PC. On the free tier, Google may use what you send to improve its products, so keep personal information out of your questions.</p></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <span class="kicker">FAQ</span>
+    <h2>Questions people ask first.</h2>
+    <div class="faq">
+      <details><summary>Is it really free?</summary><p>Yes. No ads and no paid tier. The AI is Google's free tier, through your own free key.</p></details>
+      <details><summary>Which subjects and grades?</summary><p>All of them: math from arithmetic through calculus, the sciences, English and essays, history, government, economics, world languages, computer science and more, kindergarten through college. Explanations match your grade, in 18 languages.</p></details>
+      <details><summary>Isn't this just for cheating?</summary><p>It's built to teach. Guide me mode hides the answer and reveals one step at a time, lessons check you understood, and every solution ends with a similar problem to try yourself. Follow your school's rules on AI for graded work.</p></details>
+      <details><summary>Windows says "Windows protected your PC".</summary><p>New apps that aren't code-signed yet show that message. Click <b>More info</b>, then <b>Run anyway</b>. Every release is scanned with Microsoft Defender before it's published, and its SHA-256 fingerprint is listed on the release page. Tutorly never asks you to turn off your antivirus. If a copy does, it's fake.</p></details>
+      <details><summary>What gets sent over the internet?</summary><p>Only the questions, files and text you send to the AI go to Google's Gemini API. Your decks, notes, tests, plans and history are saved on your PC. No account, no tracking.</p></details>
+      <details><summary>Mac or phone?</summary><p>Not yet. Tutorly runs on Windows 10 and 11.</p></details>
+    </div>
+  </section>
+
+  <div class="slab">
+    <img src="img/icon-256.png" alt="" width="80" height="80">
+    <h2>Start studying <mark>smarter</mark> tonight.</h2>
+    <p>Free for Windows 10 and 11.</p>
+    <div class="row">
+      <a class="pill big yellow" href="https://github.com/Tutorly-app/tutorly-app.github.io/releases/latest/download/Tutorly.zip"><svg width="20" height="20"><use href="#dl"/></svg>Download Tutorly</a>
+      <a class="pill big ghost" href="https://github.com/Tutorly-app/tutorly-app.github.io/releases/latest">Release notes and checksums</a>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Tutorly · Fonts: Figtree and Bricolage Grotesque (SIL Open Font License)</span>
+    <span>Not affiliated with Google or College Board. SAT is a trademark registered by the College Board, which is not affiliated with, and does not endorse, Tutorly.</span>
+  </footer>
+</main>
+</body>
+</html>
